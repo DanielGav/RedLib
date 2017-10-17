@@ -13,10 +13,6 @@
 #include "ClienteTCP.h"
 
 
-
-
-
-
 int main()
 {
 
@@ -25,20 +21,6 @@ int main()
 	cliente_tcp.Configurar();
 
 	cliente_tcp.Enviar();
-/*
-	asio::streambuf receive_buffer;
-	asio::read(socket, receive_buffer, asio::transfer_all(), error);
 
-	if (error && error != asio::error::eof)
-	{
-		std::cout << "receive failed: " << error.message() << std::endl;
-	}
-	else
-	{
-		const char* data = asio::buffer_cast<const char*>(
-				receive_buffer.data());
-		std::cout << data << std::endl;
-	}
-*/
 	return 0;
 }
