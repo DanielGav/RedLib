@@ -12,16 +12,14 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#include "BlackLibrary/Console.h"
-#include "BlackLibrary/MenuCreator.h"
+#include "lib/Console.h"
+#include "lib/MenuCreator.h"
 
 using namespace std;
 
 
 int main() {
-	char i;
-	int promt_x=10;
-	int promt_y=12;
+
 	BlackLibrary::Console cons;
 	BlackLibrary::MenuCreator menu;
 	menu.x=10;
