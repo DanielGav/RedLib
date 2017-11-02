@@ -1,0 +1,6 @@
+18:05:28 **** Incremental Build of configuration Debug for project test_mq_simple_server ****
+make all 
+make: Nothing to be done for 'all'.
+
+18:05:28 Build Finished (took 71ms)
+

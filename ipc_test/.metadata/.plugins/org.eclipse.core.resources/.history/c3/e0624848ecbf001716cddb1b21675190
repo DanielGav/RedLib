@@ -1,0 +1,87 @@
+/*
+ * client.c: Client program
+ *           to demonstrate interprocess commnuication
+ *           with POSIX message queues
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <mqueue.h>
+#include <iostream>
+#include <string>
+
+#define SERVER_QUEUE_NAME   "/sp-example-server"
+#define QUEUE_PERMISSIONS 0660
+#define MAX_MESSAGES 10
+#define MAX_MSG_SIZE 256
+#define MSG_BUFFER_SIZE MAX_MSG_SIZE + 10
+
+int main(int argc, char **argv) {
+	char client_queue_name[64];
+
+	mqd_t qd_server, qd_client;   // queue descriptors
+
+	std::string process_name = "undefined";
+
+	if (argc == 2) {
+		process_name = argv[1];
+	}
+
+	// create the client queue for receiving messages from server
+	sprintf(client_queue_name, "/sp-example-client-%d", getpid());
+
+	struct mq_attr attr_c, attr_s;
+
+	std::string name1 = "/client_1";
+	std::string name2 = "/server_2";
+
+	if ((qd_client = mq_open(name1.c_str(), O_RDWR | O_CREAT, 0664, 0)) == -1) {
+		perror("Client: mq_open (client)");
+		exit(1);
+	}
+
+	if ((qd_server = mq_open(name2.c_str(), O_RDWR | O_CREAT, 0664, 0)) == -1) {
+		perror("Client: mq_open (server)");
+		exit(1);
+	}
+
+	mq_getattr(qd_client, &attr_c);
+	mq_getattr(qd_server, &attr_s);
+
+	char in_buffer[MSG_BUFFER_SIZE];
+
+	char temp_buf[10];
+
+	// Default max message size is set to 8192 bytes, so we create a 9000 byte buffer
+	char buffer[100] = "perro";
+	unsigned int _prio = 1;
+
+	std::cout << "Cliente ready" << std::endl;
+
+	int cont = 0;
+	while (cont < 10) {
+		std::string buffer_to_send = process_name + " " + cont;
+		mq_send(qd_client, buffer_to_send.c_str(), strlen(buffer_to_send.c_str()),
+				_prio);
+
+		std::cout << "Mandao " << cont << std::endl;
+		cont++;
+	}
+	if (mq_close(qd_client) == -1) {
+		perror("Client: mq_close");
+		exit(1);
+	}
+
+	if (mq_unlink(client_queue_name) == -1) {
+		perror("Client: mq_unlink");
+		exit(1);
+	}
+	printf("Client: bye\n");
+
+	exit(0);
+}

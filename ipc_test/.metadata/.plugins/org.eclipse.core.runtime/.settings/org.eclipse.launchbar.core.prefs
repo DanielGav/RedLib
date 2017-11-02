@@ -1,0 +1,7 @@
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/arch=x86
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/os=linux
+configDescList=org.eclipse.launchbar.core.descriptorType.default\:test_mq_simple_server,org.eclipse.launchbar.core.descriptorType.default\:test_mq_simple_client Debug
+eclipse.preferences.version=1
+org.eclipse.launchbar.core.descriptorType.default\:test_mq_simple_client\ Debug/activeLaunchMode=run
+org.eclipse.launchbar.core.descriptorType.default\:test_mq_simple_server/activeLaunchMode=run
+org.eclipse.launchbar.core.descriptorType.default\:test_mq_simple_server/activeLaunchTarget=org.eclipse.launchbar.core.launchTargetType.local\:Local

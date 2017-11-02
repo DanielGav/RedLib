@@ -1,0 +1,84 @@
+
+
+#include <stdlib.h>  
+#include <mqueue.h>
+#include <string.h>
+#include <stdio.h>
+#include <iostream>
+#include <ctime>
+#include <sys/time.h>
+
+
+
+std::string getNow()
+{
+	
+	timeval curTime;
+	gettimeofday(&curTime, NULL);
+	int milli = curTime.tv_usec / 1000;
+
+	char buffer [80];
+	strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", localtime(&curTime.tv_sec));
+
+	char currentTime[84] = "";
+	sprintf(currentTime, "%s.%d", buffer, milli);
+	return currentTime;
+}
+
+void sendAndWait(std::string canal, mqd_t mqd_dis){
+	char *buffer = new char[9000];
+	unsigned int _prio = 1;
+	mqd_t mqd_pro;
+	memset(buffer, '\0', 9000);
+
+	std::cout << "Opening client queue " << canal << std::endl;
+	mqd_pro = mq_open(canal.c_str(), O_RDWR | O_CREAT, 0665, 0);
+	if (mqd_pro == -1) 
+	{
+		std::cout << "Error opening message queue" << std::endl;
+		exit(1);
+	}
+	
+	std::string send = std::string(" Hello world - ") + getNow() ;
+	mq_send(mqd_pro, send.c_str(), send.length(), _prio);
+	
+
+	std::cout << "Reading message from dispatching queue... " << std::endl;
+	if(mq_receive(mqd_dis, buffer, 9000, &_prio) == -1) 
+	{
+		std::cout << "Error reading message" << std::endl;
+		exit(1);
+	}
+	std::cout << "(" << getNow() << ") Recived:" << std::string(buffer) << std::endl;
+	delete buffer;
+}
+
+int main (int argc, char **argv)
+{	
+	std::string dispatch_queue_name = "/dispatch";
+	mqd_t mqd_dis;   // queue descriptors
+	struct mq_attr _attr1;
+	
+	std::cout << "Opening dispatcher message queue " << dispatch_queue_name << std::endl;
+	//mq_unlink(dispatch_queue_name.c_str());
+
+	mqd_dis = mq_open(dispatch_queue_name.c_str(), O_RDWR | O_CREAT, 0665, 0);
+	if (mqd_dis == -1) 
+	{
+		std::cout << "Error opening message queue" << std::endl;
+		exit(1);
+	}
+	mq_getattr(mqd_dis, &_attr1);
+
+	while(true) 
+	{
+		sendAndWait("/client1",mqd_dis);
+		sendAndWait("/client2",mqd_dis);
+	//	sendAndWait("/client3",mqd_dis);
+	//	sendAndWait("/client4",mqd_dis);
+	}
+		
+
+	exit(0);
+}
+
